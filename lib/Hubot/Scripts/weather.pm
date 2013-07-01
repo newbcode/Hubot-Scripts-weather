@@ -3,6 +3,7 @@ package Hubot::Scripts::weather;
 use utf8;
 use strict;
 use warnings;
+use LWP::UserAgent;
 use Data::Printer;
 
 sub load {
@@ -10,7 +11,7 @@ sub load {
  
     $robot->hear(
         qr/^weather weekly (.+)/i,    
-        \&city_process,
+        \&weekly_process,
     );
     $robot->hear(
         qr/^weather forecast (.+)/i,    
@@ -22,17 +23,35 @@ sub load {
     );
 }
 
-sub city_process {
+sub weekly_process {
 }
 
-sub fore_process {
+sub forecast_process {
 }
 
 sub current_process {
     my $msg = shift;
     my $user_input = $msg->match->[0];
+
+    woeid($user_input);
     
 }
+
+sub woeid {
+    my $city = @_;
+    p $city;
+    my $ua = LWP::UserAgent->new;
+
+    my $rep = $ua->get("http://woeid.rosselliot.co.nz/lookup/$city");
+    
+    if ($rep->is_success) {
+        print $rep->decoded_content;
+    }
+    else {
+        die $rep->status_line;
+    }
+}
+    
 
 1;
 
