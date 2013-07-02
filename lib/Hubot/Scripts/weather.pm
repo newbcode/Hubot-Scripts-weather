@@ -38,14 +38,14 @@ sub current_process {
 }
 
 sub woeid {
-    my $city = @_;
+    my $city = shift;
     p $city;
     my $ua = LWP::UserAgent->new;
 
     my $rep = $ua->get("http://woeid.rosselliot.co.nz/lookup/$city");
     
     if ($rep->is_success) {
-        print $rep->decoded_content;
+         $rep->decoded_content;
     }
     else {
         die $rep->status_line;
