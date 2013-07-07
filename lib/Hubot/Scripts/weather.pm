@@ -38,7 +38,9 @@ sub current_process {
     my $woeid = woeid_process($msg, $user_country, $user_distric);
 
     if ( $woeid ) {
-        condition_process($woeid);
+        my %current = condition_process($woeid, 'current');
+        p %current;
+
     }
     else {
         $msg->send($woeid);
@@ -46,7 +48,7 @@ sub current_process {
 }
 
 sub condition_process {
-    my $woeid_param = shift; 
+    my ($woeid_param, $user_state) = @_; 
     my $ua = LWP::UserAgent->new;
     my %current;
     my %weekly;
@@ -58,16 +60,28 @@ sub condition_process {
     if ($y_rep->is_success) {
         my $html = $y_rep->decoded_content;
 
-        my ($city, $country) = ($html =~ m{<yweather:location city="(.*?)" .*? country="(.*?)"/>}gsm); 
-        $current{location} = "$country - $city";
-        p $current{location};
-        my ($chill, $direction, $speed) = ($html =~ m{<yweather:wind chill="(\d+)" direction="(\d+)" speed="(.*?)"/>}gsm); 
-        p $chill;
-        p $direction;
-        p $speed;
-        $current{wind} = $chill;
-        p $current{wind};
+        if ( $user_state eq 'current' ) {
+            my ($condition, $temp, $date) = ($html =~ m{<yweather:condition  text="(\w+)"  code="4"  temp="(\d+)"  date="(.*?)" />}gsm);
+            $current{condition} = $condition;
+            $current{temp} = $temp;
+            $current{date} = $date;
+            my ($city, $country) = ($html =~ m{<yweather:location city="(.*?)" .*? country="(.*?)"/>}gsm); 
+            $current{location} = "$country - $city";
+            my ($chill, $direction, $speed) = ($html =~ m{<yweather:wind chill="(\d+)"   direction="(\d+)"   speed="(.*?)" />}gsm); 
+            $current{chill} = $chill;
+            $current{direction} = $direction;
+            $current{speed} = $speed;
+            my ($humidty, $visibility, $pressure, $rising) = ($html =~ m{<yweather:atmosphere humidity="(\d+)"  visibility="(\d+)"  pressure="(.*?)"  rising="(\d+)" />}gsm); 
+            $current{humidty} = $humidty;
+            $current{visibility} = $visibility;
+            $current{pressure} = $pressure;
+            $current{rising} = $rising;
+            my ($sunrise, $sunset) = ($html =~ m{<yweather:astronomy sunrise="(.*?)"   sunset="(.*?)"/>}gsm); 
+            $current{sunrise} = $sunrise;
+            $current{sunset} = $sunset;
 
+            return %current;
+        }
     }
     else {
         die $y_rep->status_line;
