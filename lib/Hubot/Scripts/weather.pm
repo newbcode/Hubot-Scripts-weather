@@ -37,11 +37,12 @@ sub current_process {
 
     my $woeid = woeid_process($msg, $user_country, $user_distric);
 
-    if ( $woeid ) {
+    if ( $woeid =~ /^\d+/) {
         my %current = condition_process($woeid, 'current');
         $msg->send("$current{location}"."[ LastTime:$current{date} ]");
         $msg->send("The status of current weather-[$current{condition}]"." temp-[$current{temp}]"." humidity-[$current{humidty}]" .
                " direction- [$current{direction}]"." speed-[$current{speed}]"." sunrise/sunset-[$current{sunrise}/$current{sunset}]");
+        my @weekly = condition_process($woeid, 'weekly');
     }
     else {
         $msg->send($woeid);
@@ -53,7 +54,6 @@ sub condition_process {
     my $ua = LWP::UserAgent->new;
     my %current;
     my %weekly;
-    my %forecast;
 
     my $y_rep = $ua->get("http://weather.yahooapis.com/forecastrss?w=$woeid_param&u=c");
     
@@ -82,6 +82,12 @@ sub condition_process {
 
             return %current;
         }
+        elsif ( $user_state eq 'weekly' ) {
+            my @weekly = $html =~ m{<yweather:forecast day="(.*?)" date="(.*?)" low="(.*?)" high="(.*?)" text="(.*?)" code="4" />}gsm;
+            p @weekly;
+#return %weekly;
+        }
+
     }
     else {
         die $y_rep->status_line;
