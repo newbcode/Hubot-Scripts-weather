@@ -39,8 +39,9 @@ sub current_process {
 
     if ( $woeid ) {
         my %current = condition_process($woeid, 'current');
-        p %current;
-
+        $msg->send("$current{location}"."[ LastTime:$current{date} ]");
+        $msg->send("The status of current weather-[$current{condition}]"." temp-[$current{temp}]"." humidity-[$current{humidty}]" .
+               " direction- [$current{direction}]"." speed-[$current{speed}]"." sunrise/sunset-[$current{sunrise}/$current{sunset}]");
     }
     else {
         $msg->send($woeid);
@@ -53,7 +54,6 @@ sub condition_process {
     my %current;
     my %weekly;
     my %forecast;
-    p $woeid_param;
 
     my $y_rep = $ua->get("http://weather.yahooapis.com/forecastrss?w=$woeid_param&u=c");
     
@@ -61,17 +61,17 @@ sub condition_process {
         my $html = $y_rep->decoded_content;
 
         if ( $user_state eq 'current' ) {
-            my ($condition, $temp, $date) = ($html =~ m{<yweather:condition  text="(\w+)"  code="4"  temp="(\d+)"  date="(.*?)" />}gsm);
+            my ($condition, $temp, $date) = ($html =~ m{<yweather:condition  text="(.*?)"  code="11"  temp="(.*?)"  date="(.*?)" />}gsm);
             $current{condition} = $condition;
             $current{temp} = $temp;
             $current{date} = $date;
             my ($city, $country) = ($html =~ m{<yweather:location city="(.*?)" .*? country="(.*?)"/>}gsm); 
             $current{location} = "$country - $city";
-            my ($chill, $direction, $speed) = ($html =~ m{<yweather:wind chill="(\d+)"   direction="(\d+)"   speed="(.*?)" />}gsm); 
+            my ($chill, $direction, $speed) = ($html =~ m{<yweather:wind chill="(.+)"   direction="(.+)"   speed="(.*?)" />}gsm); 
             $current{chill} = $chill;
             $current{direction} = $direction;
             $current{speed} = $speed;
-            my ($humidty, $visibility, $pressure, $rising) = ($html =~ m{<yweather:atmosphere humidity="(\d+)"  visibility="(\d+)"  pressure="(.*?)"  rising="(\d+)" />}gsm); 
+            my ($humidty, $visibility, $pressure, $rising) = ($html =~ m{<yweather:atmosphere humidity="(.+)"  visibility="(.*?)"  pressure="(.*?)"  rising="(.*?)" />}gsm); 
             $current{humidty} = $humidty;
             $current{visibility} = $visibility;
             $current{pressure} = $pressure;
