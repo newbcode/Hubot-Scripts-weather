@@ -29,11 +29,11 @@ sub forecast_process {
 
     if ( $woeid =~ /^\d+/) {
         my @weekly = condition_process($woeid, 'weekly');
-        $msg->send("[$weekly[0]]Day"." [$weekly[1]]"." Low/High[$weekly[2]℃ /$weekly[3]℃ ]"." Condition[$weekly[4]]");
-        $msg->send("[$weekly[5]]Day"." [$weekly[6]]"." Low/High[$weekly[7]℃ /$weekly[8]℃ ]"." Condition[$weekly[9]]");
-        $msg->send("[$weekly[10]]Day"." [$weekly[11]]"." Low/High[$weekly[12]℃ /$weekly[13]℃ ]"." Condition[$weekly[14]]");
-        $msg->send("[$weekly[15]]Day"." [$weekly[16]]"." Low/High[$weekly[17]℃ /$weekly[18]℃ ]"." Condition[$weekly[19]]");
-        $msg->send("[$weekly[20]]Day"." [$weekly[21]]"." Low/High[$weekly[22]℃ /$weekly[23]℃ ]"." Condition[$weekly[24]]");
+        $msg->send("[$weekly[0]"." $weekly[1]]"." Low/High[$weekly[2]℃ /$weekly[3]℃ ]"." Condition[$weekly[4]]");
+        $msg->send("[$weekly[5]"." $weekly[6]]"." Low/High[$weekly[7]℃ /$weekly[8]℃ ]"." Condition[$weekly[9]]");
+        $msg->send("[$weekly[10]"." $weekly[11]]"." Low/High[$weekly[12]℃ /$weekly[13]℃ ]"." Condition[$weekly[14]]");
+        $msg->send("[$weekly[15]"." $weekly[16]]"." Low/High[$weekly[17]℃ /$weekly[18]℃ ]"." Condition[$weekly[19]]");
+        $msg->send("[$weekly[20]"." $weekly[21]]"." Low/High[$weekly[22]℃ /$weekly[23]℃ ]"." Condition[$weekly[24]]");
     }
     else {
         $msg->send($woeid);
