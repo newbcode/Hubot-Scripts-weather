@@ -11,12 +11,8 @@ sub load {
     my ( $class, $robot ) = @_;
  
     $robot->hear(
-        qr/^weather weekly (.+)/i,    
-        \&weekly_process,
-    );
-    $robot->hear(
-         qr/^weather forecast (.+)/i,    
-        \&fore_process,
+        qr/^forecast (.+) (.+)/i,    
+        \&forecast_process,
     );
     $robot->hear(
         qr/^weather (.+) (.+)/i,    
@@ -24,10 +20,24 @@ sub load {
     );
 }
 
-sub weekly_process {
-}
-
 sub forecast_process {
+    my $msg = shift;
+    my $user_country = $msg->match->[0];
+    my $user_distric = $msg->match->[1];
+
+    my $woeid = woeid_process($msg, $user_country, $user_distric);
+
+    if ( $woeid =~ /^\d+/) {
+        my @weekly = condition_process($woeid, 'weekly');
+        $msg->send("[$weekly[0]]Day"." [$weekly[1]]"." Low/High[$weekly[2]℃ /$weekly[3]℃ ]"." Condition[$weekly[4]]");
+        $msg->send("[$weekly[5]]Day"." [$weekly[6]]"." Low/High[$weekly[7]℃ /$weekly[8]℃ ]"." Condition[$weekly[9]]");
+        $msg->send("[$weekly[10]]Day"." [$weekly[11]]"." Low/High[$weekly[12]℃ /$weekly[13]℃ ]"." Condition[$weekly[14]]");
+        $msg->send("[$weekly[15]]Day"." [$weekly[16]]"." Low/High[$weekly[17]℃ /$weekly[18]℃ ]"." Condition[$weekly[19]]");
+        $msg->send("[$weekly[20]]Day"." [$weekly[21]]"." Low/High[$weekly[22]℃ /$weekly[23]℃ ]"." Condition[$weekly[24]]");
+    }
+    else {
+        $msg->send($woeid);
+    }
 }
 
 sub current_process {
@@ -40,9 +50,8 @@ sub current_process {
     if ( $woeid =~ /^\d+/) {
         my %current = condition_process($woeid, 'current');
         $msg->send("$current{location}"."[ LastTime:$current{date} ]");
-        $msg->send("The status of current weather-[$current{condition}]"." temp-[$current{temp}]"." humidity-[$current{humidty}]" .
-               " direction- [$current{direction}]"." speed-[$current{speed}]"." sunrise/sunset-[$current{sunrise}/$current{sunset}]");
-        my @weekly = condition_process($woeid, 'weekly');
+        $msg->send("The status of current weather-[$current{condition}]"." temp-[$current{temp}℃ ]"." humidity-[$current{humidty}%]" .
+               " direction- [$current{direction}km]"." speed-[$current{speed}km/h]"." sunrise/sunset-[$current{sunrise}/$current{sunset}]");
     }
     else {
         $msg->send($woeid);
@@ -53,7 +62,7 @@ sub condition_process {
     my ($woeid_param, $user_state) = @_; 
     my $ua = LWP::UserAgent->new;
     my %current;
-    my %weekly;
+    my @weekly;
 
     my $y_rep = $ua->get("http://weather.yahooapis.com/forecastrss?w=$woeid_param&u=c");
     
@@ -61,7 +70,7 @@ sub condition_process {
         my $html = $y_rep->decoded_content;
 
         if ( $user_state eq 'current' ) {
-            my ($condition, $temp, $date) = ($html =~ m{<yweather:condition  text="(.*?)"  code="11"  temp="(.*?)"  date="(.*?)" />}gsm);
+            my ($condition, $temp, $date) = ($html =~ m{<yweather:condition  text="(.*?)"  code="\d+"  temp="(.*?)"  date="(.*?)" />}gsm);
             $current{condition} = $condition;
             $current{temp} = $temp;
             $current{date} = $date;
@@ -83,9 +92,8 @@ sub condition_process {
             return %current;
         }
         elsif ( $user_state eq 'weekly' ) {
-            my @weekly = $html =~ m{<yweather:forecast day="(.*?)" date="(.*?)" low="(.*?)" high="(.*?)" text="(.*?)" code="4" />}gsm;
-            p @weekly;
-#return %weekly;
+            my @weekly =  $html =~ m{<yweather:forecast day="(.*?)" date="(.*?)" low="(.*?)" high="(.*?)" text="(.*?)" code="\d+" />}gsm; 
+            return @weekly;
         }
 
     }
@@ -125,7 +133,7 @@ sub woeid_process {
 
 =pod
 
-=head1 Name y
+=head1 Name 
 
     Hubot::Scripts::weather
  
