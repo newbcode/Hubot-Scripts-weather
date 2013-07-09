@@ -138,11 +138,11 @@ sub woeid_process {
     Hubot::Scripts::weather
  
 =head1 SYNOPSIS
+
+    Returns weather information from Yahoo Weather APIs!
  
-    weather <city name>  - View current local area weather information. 
-    weather weekly <city name> - View weekly local area weather information.
-    weather weekly <city name1> <city name2>... - View weekly local areas weather information.
-    weather forecast <local name> - View local weather forecast information. (ex: KangWon-Do, Gyeonggi-Do ..)
+    weather <country> <city> - View current local area weather information. (ex: weather <south korea> <kangnam>)
+    forecast <country> <city> - View local weather forecast information. (ex: weather <south korea> <kangnam>) 
 
 =head1 AUTHOR
 
