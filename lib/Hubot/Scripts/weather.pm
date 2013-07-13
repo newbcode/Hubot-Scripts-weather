@@ -113,9 +113,10 @@ sub woeid_process {
     
     if ($rep->is_success) {
          my @woeid = $rep->decoded_content =~ m{data-woeid="(\d+)"}gsm;
+         my @countrys = $rep->decoded_content =~ m{data-woeid="\d+"><td>.*?</td><td>.*?</td><td>(.*?)</td>}gsm;
 
-         if ( $woeid[1] ) {
-            return "$error_msg";
+         if ( $countrys[0] eq $countrys[1]) {
+            return "$woeid[0]";
          }
          elsif (!@woeid ) {
             return "$error_msg";
