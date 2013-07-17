@@ -15,7 +15,7 @@ sub load {
         \&forecast_process,
     );
     $robot->hear(
-        qr/^weather (.+) (.+)/i,    
+        qr/^weather (.+)/i,    
         \&current_process,
     );
 }
@@ -103,8 +103,8 @@ sub condition_process {
 }
 
 sub woeid_process {
-    my ($msg, $country, $distric) = @_; 
-    my $param = "$country"." $distric";
+    my ($msg, $country) = @_; 
+    my $param = "$country";
     my $error_msg = 'The name of the country or the city name wrong.';
 
     my $ua = LWP::UserAgent->new;
