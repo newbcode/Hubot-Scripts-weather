@@ -1,4 +1,5 @@
 package Hubot::Scripts::weather;
+# ABSTRACT: Weather Script for Hubot. 
 
 use utf8;
 use strict;
@@ -132,10 +133,6 @@ sub woeid_process {
 
 =pod
 
-=head1 Name 
-
-    Hubot::Scripts::weather
- 
 =head1 SYNOPSIS
 
     Returns weather information from Yahoo Weather APIs!
@@ -143,8 +140,4 @@ sub woeid_process {
     weather <country> <city> - View current local area weather information. (ex: weather <south korea> <kangnam>)
     forecast <country> <city> - View local weather forecast information. (ex: weather <south korea> <kangnam>) 
 
-=head1 AUTHOR
-
-    YunChang Kang <codenewb@gmail.com>
- 
 =cut
