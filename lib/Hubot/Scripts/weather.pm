@@ -11,7 +11,7 @@ sub load {
     my ( $class, $robot ) = @_;
  
     $robot->hear(
-        qr/^forecast (.+) (.+)/i,    
+        qr/^forecast (.+)/i,    
         \&forecast_process,
     );
     $robot->hear(
@@ -23,9 +23,8 @@ sub load {
 sub forecast_process {
     my $msg = shift;
     my $user_country = $msg->match->[0];
-    my $user_distric = $msg->match->[1];
 
-    my $woeid = woeid_process($msg, $user_country, $user_distric);
+    my $woeid = woeid_process($msg, $user_country);
 
     if ( $woeid =~ /^\d+/) {
         my @weekly = condition_process($woeid, 'weekly');
@@ -43,9 +42,8 @@ sub forecast_process {
 sub current_process {
     my $msg = shift;
     my $user_country = $msg->match->[0];
-    my $user_distric = $msg->match->[1];
 
-    my $woeid = woeid_process($msg, $user_country, $user_distric);
+    my $woeid = woeid_process($msg, $user_country);
 
     if ( $woeid =~ /^\d+/) {
         my %current = condition_process($woeid, 'current');
