@@ -19,6 +19,10 @@ sub load {
         qr/^weather (.+)/i,    
         \&current_process,
     );
+    $robot->hear(
+        qr/^(\d+)/i,    
+        \&station,
+    );
 }
 
 sub forecast_process {
@@ -127,6 +131,26 @@ sub woeid_process {
     else {
         die $rep->status_line;
     }
+}
+
+sub station {
+    my $msg = shift;
+    my $user_ip = $msg->match->[0];
+
+    $msg->http("http://www.ip2location.com/$user_ip")->get (
+        sub {
+            my ($body, $hdr) = @_;
+
+            return if ( !$body || $hdr->{Status} !~ /^2/ );
+
+            my $decoded_body = decode("utf8", $body);
+#if ( $decoded_body =~ m{<td><b>Weather Station</b></td>.*?<td>(.*?)</td>}gsm ) {
+            p $decoded_body;
+                if ( $decoded_body =~ m{<td><b>(Weather Station)</b></td>} ) {
+                    print $1;
+                }
+            }
+        );
 }
 
 1;
