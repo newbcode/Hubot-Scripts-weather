@@ -20,9 +20,16 @@ sub load {
         \&current_process,
     );
     $robot->hear(
-        qr/^(\d+)/i,    
+#qr/@(\d+\.\d+\.\d+\.\d+$)/i,    
+        qr/\.*?@(\d+\.\d+\.\d+\.\d+)\) has joined \#perl\-kr/i,    
+        \&parser_ip,
+    );
+=pod
+    $robot->hear(
+        qr/^(\d+\.\d+\.\d+\.\d+)/i,    
         \&station,
     );
+=cut
 }
 
 sub forecast_process {
@@ -144,13 +151,21 @@ sub station {
             return if ( !$body || $hdr->{Status} !~ /^2/ );
 
             my $decoded_body = decode("utf8", $body);
-#if ( $decoded_body =~ m{<td><b>Weather Station</b></td>.*?<td>(.*?)</td>}gsm ) {
-            p $decoded_body;
-                if ( $decoded_body =~ m{<td><b>(Weather Station)</b></td>} ) {
+            p $user_ip;
+                if ( $decoded_body =~ m{<td><b>Weather Station</b></td>.*?<td>(.*?)</td>}gsm ) {
                     print $1;
                 }
             }
         );
+}
+
+sub parser_ip {
+    my $msg = shift;
+    my $sender = $msg->message->user->{name};
+    my $join_ip = $msg->match->[0];
+
+    print "$join_ip\n";
+    print "$sender\n";
 }
 
 1;
