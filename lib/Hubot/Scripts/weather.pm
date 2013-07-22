@@ -20,8 +20,12 @@ sub load {
         \&current_process,
     );
     $robot->hear(
-#qr/@(\d+\.\d+\.\d+\.\d+$)/i,    
-        qr/\.*?@(\d+\.\d+\.\d+\.\d+)\) has joined \#perl\-kr/i,    
+        qr/^@(.+)/i,    
+        \&current_process,
+    );
+    $robot->hear(
+        qr/@(\d+\.\d+\.\d+\.\d+$)/i,    
+        #qr/\.*?@(\d+\.\d+\.\d+\.\d+)\) has joined \#perl\-kr/i,    
         \&parser_ip,
     );
 =pod
