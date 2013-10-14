@@ -20,7 +20,7 @@ sub load {
         \&current_process,
     );
     $robot->hear(
-        qr/^@(.+)/i,    
+        qr/^@(.+)$/i,    
         \&current_process,
     );
     $robot->hear(
@@ -155,7 +155,6 @@ sub station {
             return if ( !$body || $hdr->{Status} !~ /^2/ );
 
             my $decoded_body = decode("utf8", $body);
-            p $user_ip;
                 if ( $decoded_body =~ m{<td><b>Weather Station</b></td>.*?<td>(.*?)</td>}gsm ) {
                     print $1;
                 }
@@ -179,8 +178,7 @@ sub parser_ip {
 =head1 SYNOPSIS
 
     Returns weather information from Yahoo Weather APIs!
- 
-    weather <country> <city> - View current local area weather information. (ex: weather <south korea> <kangnam>)
-    forecast <country> <city> - View local weather forecast information. (ex: weather <south korea> <kangnam>) 
-
+    weather <city> or @city - View current local area weather information.
+    (ex: weather <seoul> or @seoul)
+    forecast <city> - View local weather forecast information. (ex: forecast <seoul>) 
 =cut
